@@ -27,3 +27,8 @@
 
 0. 渲染一个plane √
 1. TextureLoader √
+2. GLTFLoader √
+
+## 问题
+
+0. renderer.setPixelRatio($window.devicePixelRatio) 图像不居中
