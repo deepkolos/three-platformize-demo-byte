@@ -1,91 +1,215 @@
-import { $cancelAnimationFrame, $requestAnimationFrame, $window, AmbientLight, BoxGeometry, Color, DirectionalLight, LinearEncoding, Mesh, MeshBasicMaterial, PerspectiveCamera, PlaneBufferGeometry, PLATFORM, Scene, sRGBEncoding, TextureLoader, WebGL1Renderer } from 'three-platformize'
-import { BytePlatform } from 'three-platformize/src/BytePlatform'
-import { GLTF, GLTFLoader } from 'three-platformize/examples/jsm/loaders/GLTFLoader'
-import { OrbitControls } from 'three-platformize/examples/jsm/controls/OrbitControls'
+// index.ts
+import {
+  $requestAnimationFrame as requestAnimationFrame,
+  $window as window,
+  Clock,
+  PerspectiveCamera,
+  PLATFORM,
+  Scene,
+  sRGBEncoding,
+  TextureLoader,
+  WebGL1Renderer,
+  REVISION,
+  Color,
+} from 'three-platformize';
+import { BytePlatform } from 'three-platformize/src/BytePlatform';
+import { GLTFLoader } from 'three-platformize/examples/jsm/loaders/GLTFLoader';
+import {
+  DemoDeps,
+  Demo,
+  DemoGLTFLoader,
+  DemoThreeSpritePlayer,
+  DemoDeviceOrientationControls,
+  DemoRGBELoader,
+  DemoSVGLoader,
+  DemoOBJLoader,
+  DemoEXRLoader,
+  DemoHDRPrefilterTexture,
+  DemoMTLLoader,
+  DemoLWOLoader,
+  DemoFBXLoader,
+  DemoBVHLoader,
+  DemoColladaLoader,
+  DemoTTFLoader,
+  DemoSTLLoader,
+  DemoPDBLoader,
+  DemoTGALoader,
+} from 'three-platformize-demo/src/index';
 
+console.log('THREE Version', REVISION);
+
+const DEMO_MAP = {
+  // BasisLoader: DemoBasisLoader,
+  // MemoryTest: DemoMemoryTest,
+
+  // MeshOpt: DemoMeshOpt,
+  TGALoader: DemoTGALoader,
+  PDBLoader: DemoPDBLoader,
+  STLLoader: DemoSTLLoader,
+  TTFLoader: DemoTTFLoader,
+  BVHLoader: DemoBVHLoader,
+  FBXLoader: DemoFBXLoader,
+  LWOLoader: DemoLWOLoader,
+  MTLLoader: DemoMTLLoader,
+  EXRLoader: DemoEXRLoader,
+  OBJLoader: DemoOBJLoader,
+  SVGLoader: DemoSVGLoader,
+  RGBELoader: DemoRGBELoader,
+  GLTFLoader: DemoGLTFLoader,
+  ColladaLoader: DemoColladaLoader,
+  // MeshQuantization: DemoMeshQuantization,
+  ThreeSpritePlayer: DemoThreeSpritePlayer,
+  HDRPrefilterTexture: DemoHDRPrefilterTexture,
+  DeviceOrientationControls: DemoDeviceOrientationControls,
+};
+
+const getNode = id =>
+  new Promise(r =>
+    tt
+      .createSelectorQuery()
+      .select(id)
+      .node()
+      .exec(r),
+  );
+
+// @ts-ignore
 Page({
   disposing: false,
+  switchingItem: false,
+  deps: {} as DemoDeps,
+  currDemo: null as unknown as Demo,
   platform: null as unknown as BytePlatform,
-  frameId: -1,
+  helperCanvas: null as unknown as any,
+
+  data: {
+    showMenu: true,
+    showCanvas: false,
+    currItem: -1,
+    menuList: [
+      'GLTFLoader',
+      'ThreeSpritePlayer',
+      // 'DeviceOrientationControls',
+      'RGBELoader',
+      'SVGLoader',
+      'OBJLoader',
+      // 'MeshOpt',
+      'EXRLoader',
+      'HDRPrefilterTexture',
+      'MTLLoader',
+      'LWOLoader',
+      'FBXLoader',
+      'BVHLoader',
+      'ColladaLoader',
+      // 'MeshQuantization',
+      'TTFLoader',
+      'STLLoader',
+      'PDBLoader',
+      'TGALoader',
+      // 'MemoryTest',
+      // 'BasisLoader(TODO)',
+      // 'Raycaster(TODO)',
+      // 'Geometry(TODO)',
+    ],
+  },
 
   onReady() {
-    console.log('ready')
-    tt.createSelectorQuery().select('#gl').node().exec(async (res) => {
-      const canvas = res[0].node
-      console.log('init scene')
+    this.onCanvasReady();
+  },
 
-      this.platform = new BytePlatform(canvas)
-      PLATFORM.set(this.platform);
-
-      const renderer = new WebGL1Renderer({ canvas, antialias: true, alpha: true })
-      const camera = new PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
-      const scene = new Scene()
-      const gltfLoader = new GLTFLoader()
-      const textureLoader = new TextureLoader()
-      const controls = new OrbitControls(camera, canvas);
-      controls.enableDamping = true
-      console.log(canvas.width, canvas.height, $window.devicePixelRatio)
-
-      {
-        const geometry = new PlaneBufferGeometry(1, 1)
-        const material = new MeshBasicMaterial({ color: 0x123456 })
-        const mesh = new Mesh(geometry, material)
-        scene.add(mesh)
-      }
-
-      {
-        const geometry = new PlaneBufferGeometry(1, 1)
-        const material = new MeshBasicMaterial({
-          map: textureLoader.load(
-            'https://cdn.static.oppenlab.com/weblf/test/open%20mouth.jpg',
-            (tex) => {
-              tex.encoding = LinearEncoding
-              console.log('texture loaded')
-            },
-            undefined,
-            (e) => console.log('texture load error', e),
-          ),
-        })
-        const mesh = new Mesh(geometry, material)
-        mesh.position.y = 1;
-        scene.add(mesh)
-      }
-
-      gltfLoader.loadAsync('https://dtmall-tel.alicdn.com/edgeComputingConfig/upload_models/1591673169101/RobotExpressive.glb').then((gltf: GLTF) => {
+  onCanvasReady() {
+    console.log('onCanvasReady');
+    Promise.all([getNode('#gl'), getNode('#canvas')]).then(
+      ([glRes, canvasRes]) => {
         // @ts-ignore
-        gltf.parser = null;
-        gltf.scene.position.y = -2;
-        gltf.scene.scale.set(0.3, 0.3, 0.3)
-        scene.add(gltf.scene);
-      })
+        this.initCanvas(glRes[0].node, canvasRes[0].node);
+      },
+    );
+  },
 
-      scene.background = new Color(0x654321)
+  initCanvas(canvas, helperCanvas) {
+    const platform = new BytePlatform(canvas);
+    this.platform = platform;
+    // platform.enableDeviceOrientation('game');
+    PLATFORM.set(platform);
 
-      camera.position.z = 5
-      renderer.outputEncoding = sRGBEncoding
-      scene.add(new AmbientLight(0xffffff, 1.0))
-      scene.add(new DirectionalLight(0xffffff, 1.0))
+    console.log(window.innerWidth, window.innerHeight);
+    console.log(canvas.width, canvas.height);
 
-      // 设置dpr后图像不居中
-      // renderer.setPixelRatio($window.devicePixelRatio)
-      renderer.setSize(canvas.width, canvas.height, false)
+    const renderer = new WebGL1Renderer({
+      canvas,
+      antialias: true,
+      alpha: false,
+    });
+    const camera = new PerspectiveCamera(
+      75,
+      canvas.width / canvas.height,
+      0.1,
+      1000,
+    );
+    const scene = new Scene();
+    const clock = new Clock();
+    const gltfLoader = new GLTFLoader();
+    const textureLoader = new TextureLoader();
 
-      const render = () => {
-        if (!this.disposing) this.frameId = $requestAnimationFrame(render)
-        controls.update()
-        renderer.render(scene, camera);
-      }
-      render()
-    })
+    this.deps = { renderer, camera, scene, clock, gltfLoader, textureLoader };
+    this.helperCanvas = helperCanvas;
+
+    scene.position.z = -3;
+    scene.background = new Color(0xffffff);
+    renderer.outputEncoding = sRGBEncoding;
+    // renderer.setPixelRatio(2);
+    // renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(canvas.width, canvas.height);
+
+    const render = () => {
+      if (this.disposing) return;
+      requestAnimationFrame(render);
+      (this.currDemo as Demo)?.update();
+      renderer.render(scene, camera);
+    };
+
+    render();
+    console.log('canvas inited');
+  },
+
+  onMenuClick() {
+    const showMenu = !this.data.showMenu;
+    if (showMenu) {
+      this.setData({ showMenu, showCanvas: false });
+    } else {
+      this.setData({ showMenu });
+      setTimeout(() => {
+        this.setData({ showCanvas: true });
+      }, 330);
+    }
+  },
+
+  async onMenuItemClick(e) {
+    const { i, item } = e.currentTarget.dataset;
+    tt.showLoading({ mask: false, title: '加载中' });
+    if (this.switchingItem || !DEMO_MAP[item]) return;
+
+    (this.currDemo as Demo)?.dispose();
+    this.switchingItem = true;
+    this.currDemo = null as unknown as Demo;
+
+    const demo = new DEMO_MAP[item](this.deps) as Demo;
+    await demo.init();
+    this.currDemo = demo;
+    this.setData({ currItem: i });
+    this.onMenuClick();
+    this.switchingItem = false;
+    tt.hideLoading();
+  },
+
+  onTX(e) {
+    this.platform.dispatchTouchEvent(e);
+    this.platform.dispatchTouchEvent(e);
   },
 
   onUnload() {
-    this.disposing = true
-    $cancelAnimationFrame(this.frameId)
-    PLATFORM.dispose()
+    this.disposing = true;
+    (this.currDemo as Demo)?.dispose();
+    PLATFORM.dispose();
   },
-
-  onTX(e: any) {
-    this.platform.dispatchTouchEvent(e)
-  },
-})
+});

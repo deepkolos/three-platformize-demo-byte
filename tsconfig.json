@@ -18,7 +18,11 @@
     "removeComments": true,
     "pretty": true,
     "strictPropertyInitialization": true,
-    "lib": ["es5", "ES6"],
+    "lib": [
+      "es5",
+      "ES6",
+      "DOM"
+    ],
     "typeRoots": [
       "./typings"
     ]

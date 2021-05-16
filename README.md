@@ -20,7 +20,7 @@
 // 运行构建
 > npm run dev
 
-// 小程序打开即可
+// 小程序打开即可 **miniprogram** 目录
 ```
 
 ## 进度
@@ -28,7 +28,22 @@
 0. 渲染一个plane √
 1. TextureLoader √
 2. GLTFLoader √
+3. RGBELoader √
+4. SVGLoader √
+5. OBJLoader √
+6. EXRLoader √
+7. HDRPrefilterTexture √
+8. MTLLoader √
+9. LWOLoader √
+10. FBXLoader √
+11. BVHLoader √
+12. COlladaLoader √ (DOMParser querySelector 未适配)
+13. TTFLoader √
+14. STLLoader √
+15. PDBLoader √
+16. TGALoader √
 
 ## 问题
 
 0. renderer.setPixelRatio($window.devicePixelRatio) 图像不居中
+1. OrbitControls 双指操作无效

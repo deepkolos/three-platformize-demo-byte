@@ -9,12 +9,15 @@ const plugins = [
   resolve({ extensions: ['.ts', '.js'] }),
   commonjs(),
   sucrase({ transforms: ['typescript'] }),
-  terser({ output: { comments: false }, mangle: false, compress: false }),
+  // terser({ output: { comments: false }, mangle: false, compress: false }),
 ];
 
 export default [
   {
-    input: ['./miniprogram/pages/index/index.ts'],
+    input: [
+      './miniprogram/pages/index/index.ts',
+      './miniprogram/pages/simple/simple.ts',
+    ],
     treeshake: true,
     output: {
       format: 'cjs',
@@ -23,6 +26,7 @@ export default [
       entryFileNames: 'pages/[name]/[name].js',
       manualChunks: {
         'three-platformize': ['three-platformize'],
+        'three-platformize-demo': ['three-platformize-demo/src/index'],
       },
     },
     plugins,
