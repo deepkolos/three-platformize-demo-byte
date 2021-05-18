@@ -203,7 +203,7 @@ Page({
   },
 
   onTX(e) {
-    this.platform.dispatchTouchEvent(e);
+    console.log(e)
     this.platform.dispatchTouchEvent(e);
   },
 

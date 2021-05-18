@@ -938,6 +938,7 @@ class BytePlatform {
 
   dispose() {
     // this.disableDeviceOrientation();
+    this.canvas.dispose();
     this.canvas.width = 0;
     this.canvas.height = 0;
     if (this.canvas) this.canvas.ownerDocument = null;
