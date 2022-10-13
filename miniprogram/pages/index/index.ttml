@@ -9,9 +9,9 @@
     <view class="menu-item {{currItem === idx ? 'active' : ''}}" tt:for="{{menuList}}" tt:for-index="idx"
       tt:for-item="item" data-i="{{idx}}" tt:key="idx" data-item="{{item}}" bindtap="onMenuItemClick">{{item}}</view>
   </view>
-
+  
+  <canvas class="helper-canvas" type="2d" id="canvas"></canvas>
   <canvas class="canvas {{showCanvas ? '' : 'hide'}}" id="gl" type="webgl" bindtouchstart="onTX" bindtouchmove="onTX"
     bindtouchend="onTX">
-    <canvas class="helper-canvas" type="2d" id="canvas"></canvas>
   </canvas>
 </view>
