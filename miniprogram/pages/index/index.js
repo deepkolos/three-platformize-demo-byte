@@ -101,7 +101,14 @@ Page({
     this.platform = platform;
     // platform.enableDeviceOrientation('game');
     threePlatformize.PLATFORM.set(platform);
+    let {width,height} = canvas;
+    console.log(canvas.width,canvas.height)
+    let gl = canvas.getContext('webgl');
+    let {pixelRatio}  = tt.getSystemInfoSync();
 
+    gl.canvas.width = width * pixelRatio
+    gl.canvas.height = height * pixelRatio
+    gl.viewport(0, 0, width * pixelRatio, height * pixelRatio);
     console.log(threePlatformize.$window.innerWidth, threePlatformize.$window.innerHeight);
     console.log(canvas.width, canvas.height);
 
